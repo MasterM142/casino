@@ -22,7 +22,7 @@ def blackjack():
     return render_template('blackjack.html')
 
 # Zusätzliche Routen für zukünftige Spiele
-@app.route('/roulette')
+@app.route('/dice')
 def roulette():
     """Roulette Spiel (für später)"""
     return render_template('roulette.html')
