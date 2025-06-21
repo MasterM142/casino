@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Game</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0E1121;
+            --bg-secondary: #1A1C2F;
+            --bg-field: #1B1F3D;
+            --bg-module: #252A3F;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-blue: #2F80ED;
+            --accent-green: #7ED321;
+            --accent-red: #ef4444;
+            --border-color: #2d3748;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Left Sidebar - 30% */
+        .sidebar {
+            width: 30%;
+            background-color: var(--bg-primary);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        /* User Info Box */
+        .user-info-box {
+            background-color: var(--bg-module);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .user-welcome {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .balance-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .balance-value {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+        
+        .profit-value.positive {
+            color: var(--accent-green);
+        }
+        
+        .profit-value.negative {
+            color: var(--accent-red);
+        }
+        
+        .logout-btn {
+            background-color: var(--accent-red);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        /* Module Box */
+        .module-box {
+            background-color: var(--bg-module);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+        }
+        
+        .mode-tab {
+            width: 120px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-tab.active {
+            background-color: var(--accent-blue);
+            color: white;
+            box-shadow: 0 0 10px rgba(47, 128, 237, 0.5);
+        }
+        
+        .mode-tab.inactive {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--text-secondary);
+        }
+        
+        /* Section styling */
+        .section-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        /* Bet Amount Section */
+        .bet-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .bet-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bet-input {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-size: 14px;
+            width: 120px;
+        }
+        
+        .bet-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        .bet-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .bet-btn {
+            width: 50px;
+            height: 30px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .bet-btn:hover {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        
+        /* Prediction Section */
+        .prediction-section {
+            margin-bottom: 20px;
+        }
+        
+        .prediction-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .prediction-btn {
+            flex: 1;
+            height: 45px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .prediction-btn.over {
+            background-color: var(--accent-green);
+            color: white;
+        }
+        
+        .prediction-btn.under {
+            background-color: var(--accent-red);
+            color: white;
+        }
+        
+        .prediction-btn.active {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Roll Under/Over Input */
+        .roll-input-section {
+            margin-bottom: 20px;
+        }
+        
+        .roll-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .roll-input {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-size: 14px;
+            width: 80px;
+            text-align: center;
+        }
+        
+        .roll-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        .roll-slider {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, var(--accent-red) 0%, var(--accent-red) 50%, var(--accent-green) 50%, var(--accent-green) 100%);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 10px 0;
+        }
+        
+        .roll-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .roll-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .multiplier-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+        }
+        
+        .multiplier-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        
+        .multiplier-value {
+            color: var(--accent-blue);
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .win-chance {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        
+        /* Auto Mode Section */
+        .auto-section {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .auto-section.active {
+            display: flex;
+        }
+        
+        .auto-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .auto-input {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .auto-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+        
+        /* Strategy Section */
+        .strategy-section {
+            margin-top: 15px;
+        }
+        
+        .strategy-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .strategy-btn {
+            flex: 1;
+            height: 35px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .strategy-btn.active {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+        
+        .strategy-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        /* Start Button */
+        .start-btn {
+            background-color: var(--accent-green);
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .start-btn:hover {
+            background-color: #5cb85c;
+            transform: translateY(-2px);
+        }
+        
+        .start-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Right Game Area - 70% */
+        .game-area {
+            width: 70%;
+            background-color: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+        }
+        
+        /* Fair Play Badge */
+        .fair-play {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        /* Dice Display */
+        .dice-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .dice-display {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(145deg, var(--bg-module), var(--bg-secondary));
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            font-weight: bold;
+            color: var(--text-primary);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .dice-display.rolling {
+            animation: diceRoll 1s ease-in-out;
+        }
+        
+        .dice-display.win {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 30px rgba(126, 211, 33, 0.5);
+        }
+        
+        .dice-display.lose {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+        }
+        
+        @keyframes diceRoll {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            75% { transform: rotate(270deg) scale(1.1); }
+        }
+        
+        .dice-number {
+            font-size: 80px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Game Info */
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background-color: var(--bg-module);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .info-value.green {
+            color: var(--accent-green);
+        }
+        
+        .info-value.red {
+            color: var(--accent-red);
+        }
+        
+        .info-value.blue {
+            color: var(--accent-blue);
+        }
+        
+        /* Result Display */
+        .result-display {
+            background-color: var(--bg-module);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            min-width: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .result-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .result-text.win {
+            color: var(--accent-green);
+        }
+        
+        .result-text.lose {
+            color: var(--accent-red);
+        }
+        
+        .result-amount {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        /* Auto Stats */
+        .auto-stats {
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        
+        .auto-stats.active {
+            display: grid;
+        }
+        
+        .auto-stat-card {
+            background-color: var(--bg-module);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .auto-stat-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .auto-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .modal-footer .btn {
+            width: 100%;
+        }
+        
+        .form-control {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .form-control:focus {
+            background-color: var(--bg-primary);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.25rem rgba(47, 128, 237, 0.25);
+        }
+        
+        /* Toast Container */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .toast {
+            backdrop-filter: blur(10px);
+            margin-bottom: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .game-area {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .dice-display {
+                width: 150px;
+                height: 150px;
+                font-size: 60px;
+            }
+            
+            .game-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .auto-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Particle Animation */
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.8;
+            z-index: 9999;
+            animation: particleAnimation 1s forwards;
+        }
+        
+        @keyframes particleAnimation {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login/Register Modal -->
+    <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="authModalLabel">Anmelden oder Registrieren</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label text-white">Benutzername</label>
+                        <input type="text" class="form-control" id="username" placeholder="Benutzername eingeben">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-white">Passwort</label>
+                        <input type="password" class="form-control" id="password" placeholder="Passwort eingeben">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" id="loginBtn">Anmelden</button>
+                    <button type="button" class="btn btn-primary" id="registerBtn">Registrieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <!-- User Info Box -->
+            <div class="user-info-box">
+                <div class="user-welcome" id="welcome-username">Willkommen</div>
+                <div class="balance-info">
+                    <span class="balance-label">Balance:</span>
+                    <span class="balance-value" id="user-balance">$0.00</span>
+                </div>
+                <div class="balance-info">
+                    <span class="balance-label">Spiele gespielt:</span>
+                    <span class="balance-value" id="games-played">0</span>
+                </div>
+                <div class="balance-info">
+                    <span class="balance-label">Gesamt gewonnen:</span>
+                    <span class="balance-value" id="total-won">$0.00</span>
+                </div>
+                <div class="balance-info">
+                    <span class="balance-label">Profit:</span>
+                    <span class="profit-value" id="profit">$0.00</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt me-1"></i>Abmelden
+                </button>
+            </div>
+
+            <!-- Module Box -->
+            <div class="module-box">
+                <!-- Mode Tabs -->
+                <div class="mode-tabs">
+                    <button class="mode-tab active" id="manual-tab">Manual</button>
+                    <button class="mode-tab inactive" id="auto-tab">Auto</button>
+                </div>
+
+                <!-- Manual Mode Content -->
+                <div id="manual-content" class="manual-section">
+                    <!-- Bet Amount -->
+                    <div class="bet-section">
+                        <div class="section-label">Bet Amount</div>
+                        <div class="bet-input-container">
+                            <input type="text" class="bet-input" id="bet-amount" value="$10.00" placeholder="Bet Amount">
+                            <div class="bet-buttons">
+                                <button class="bet-btn" onclick="setBet(0.5)">1/2</button>
+                                <button class="bet-btn" onclick="setBet(2)">2x</button>
+                                <button class="bet-btn" onclick="setBet('max')">Max</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prediction Section -->
+                    <div class="prediction-section">
+                        <div class="section-label">Prediction</div>
+                        <div class="prediction-buttons">
+                            <button class="prediction-btn over active" id="over-btn">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Over</span>
+                            </button>
+                            <button class="prediction-btn under" id="under-btn">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>Under</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Roll Number Input -->
+                    <div class="roll-input-section">
+                        <div class="section-label">Roll <span id="prediction-type">Over</span></div>
+                        <div class="roll-input-container">
+                            <input type="number" class="roll-input" id="roll-number" value="50" min="2" max="98">
+                            <input type="range" class="roll-slider" id="roll-slider" min="2" max="98" value="50">
+                        </div>
+                        <div class="multiplier-display">
+                            <div>
+                                <div class="multiplier-label">Multiplier</div>
+                                <div class="multiplier-value" id="multiplier">1.98x</div>
+                            </div>
+                            <div>
+                                <div class="multiplier-label">Win Chance</div>
+                                <div class="win-chance" id="win-chance">49.50%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto Mode Content -->
+                <div id="auto-content" class="auto-section">
+                    <!-- Auto Bet Amount -->
+                    <div class="auto-input-group">
+                        <div class="section-label">Bet Amount</div>
+                        <input type="text" class="auto-input" id="auto-bet-amount" value="$1.00" placeholder="Bet Amount">
+                    </div>
+
+                    <!-- Number of Bets -->
+                    <div class="auto-input-group">
+                        <div class="section-label">Number of Bets</div>
+                        <input type="number" class="auto-input" id="auto-bet-count" value="10" placeholder="Number of Bets">
+                    </div>
+
+                    <!-- Auto Prediction -->
+                    <div class="prediction-section">
+                        <div class="section-label">Prediction</div>
+                        <div class="prediction-buttons">
+                            <button class="prediction-btn over active" id="auto-over-btn">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Over</span>
+                            </button>
+                            <button class="prediction-btn under" id="auto-under-btn">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>Under</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Auto Roll Number -->
+                    <div class="roll-input-section">
+                        <div class="section-label">Roll <span id="auto-prediction-type">Over</span></div>
+                        <div class="roll-input-container">
+                            <input type="number" class="roll-input" id="auto-roll-number" value="50" min="2" max="98">
+                            <input type="range" class="roll-slider" id="auto-roll-slider" min="2" max="98" value="50">
+                        </div>
+                        <div class="multiplier-display">
+                            <div>
+                                <div class="multiplier-label">Multiplier</div>
+                                <div class="multiplier-value" id="auto-multiplier">1.98x</div>
+                            </div>
+                            <div>
+                                <div class="multiplier-label">Win Chance</div>
+                                <div class="win-chance" id="auto-win-chance">49.50%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stop Conditions -->
+                    <div class="auto-input-group">
+                        <div class="section-label">Stop on Win</div>
+                        <input type="text" class="auto-input" id="auto-stop-win" value="$0.00" placeholder="Stop on Win">
+                    </div>
+
+                    <div class="auto-input-group">
+                        <div class="section-label">Stop on Loss</div>
+                        <input type="text" class="auto-input" id="auto-stop-loss" value="$0.00" placeholder="Stop on Loss">
+                    </div>
+
+                    <!-- Strategy Section -->
+                    <div class="strategy-section">
+                        <div class="section-label">Strategy</div>
+                        <div class="strategy-buttons">
+                            <button class="strategy-btn active" id="strategy-none">None</button>
+                            <button class="strategy-btn" id="strategy-martingale">Martingale</button>
+                            <button class="strategy-btn" id="strategy-fibonacci">Fibonacci</button>
+                        </div>
+                        <div class="strategy-inputs">
+                            <div class="auto-input-group">
+                                <div class="section-label">On Win</div>
+                                <select class="auto-input" id="strategy-win">
+                                    <option value="reset">Reset to Base</option>
+                                    <option value="increase">Increase by %</option>
+                                </select>
+                            </div>
+                            <div class="auto-input-group">
+                                <div class="section-label">On Loss</div>
+                                <select class="auto-input" id="strategy-loss">
+                                    <option value="reset">Reset to Base</option>
+                                    <option value="increase">Increase by %</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Start Button -->
+                <button class="start-btn" id="start-game">Start Game</button>
+            </div>
+        </div>
+
+        <!-- Right Game Area -->
+        <div class="game-area">
+            <!-- Fair Play Badge -->
+            <div class="fair-play">
+                <i class="fas fa-shield-alt"></i>
+                <span>Provably Fair</span>
+            </div>
+
+            <!-- Dice Container -->
+            <div class="dice-container">
+                <div class="dice-display" id="dice-display">
+                    <div class="dice-number" id="dice-number">?</div>
+                </div>
+                
+                <!-- Result Display -->
+                <div class="result-display" id="result-display" style="display: none;">
+                    <div class="result-text" id="result-text">Ready to Roll!</div>
+                    <div class="result-amount" id="result-amount">$0.00</div>
+                </div>
+            </div>
+
+            <!-- Game Info -->
+            <div class="game-info">
+                <div class="info-card">
+                    <div class="info-label">Current Bet</div>
+                    <div class="info-value blue" id="current-bet">$0.00</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Potential Win</div>
+                    <div class="info-value green" id="potential-win">$0.00</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Last Roll</div>
+                    <div class="info-value" id="last-roll">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Streak</div>
+                    <div class="info-value" id="streak">0</div>
+                </div>
+            </div>
+
+            <!-- Auto Stats -->
+            <div class="auto-stats" id="auto-stats">
+                <div class="auto-stat-card">
+                    <div class="auto-stat-label">Bets Made</div>
+                    <div class="auto-stat-value" id="auto-bets-made">0</div>
+                </div>
+                <div class="auto-stat-card">
+                    <div class="auto-stat-label">Wins</div>
+                    <div class="auto-stat-value green" id="auto-wins">0</div>
+                </div>
+                <div class="auto-stat-card">
+                    <div class="auto-stat-label">Losses</div>
+                    <div class="auto-stat-value red" id="auto-losses">0</div>
+                </div>
+                <div class="auto-stat-card">
+                    <div class="auto-stat-label">Profit</div>
+                    <div class="auto-stat-value" id="auto-profit">$0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Bootstrap and other scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // User data management
+        let currentUser = null;
+        const STORAGE_KEY = 'diceGameUserData';
+
+        // Game variables
+        let gameActive = false;
+        let autoMode = false;
+        let autoRunning = false;
+        let currentBet = 0;
+        let userBalance = 0;
+        let gamesPlayed = 0;
+        let totalWon = 0;
+        let totalWagered = 0;
+        let currentStreak = 0;
+        let lastRoll = 0;
+        let isOver = true; // true for over, false for under
+        let rollTarget = 50;
+
+        // Auto mode variables
+        let autoBetCount = 0;
+        let autoCurrentBets = 0;
+        let autoStopWin = 0;
+        let autoStopLoss = 0;
+        let autoStartBalance = 0;
+        let autoWins = 0;
+        let autoLosses = 0;
+        let autoStrategy = 'none';
+        let baseBetAmount = 0;
+        let currentAutoMultiplier = 1;
+
+        // Strategy variables
+        let fibonacciSequence = [1, 1];
+        let fibonacciIndex = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            checkUserLogin();
+            
+            // Initialize game
+            initializeGame();
+            
+            // Event listeners
+            document.getElementById('start-game').addEventListener('click', handleStartButton);
+            
+            // Mode tab listeners
+            document.getElementById('manual-tab').addEventListener('click', () => switchMode('manual'));
+            document.getElementById('auto-tab').addEventListener('click', () => switchMode('auto'));
+            
+            // Auth event listeners
+            document.getElementById('loginBtn').addEventListener('click', loginUser);
+            document.getElementById('registerBtn').addEventListener('click', registerUser);
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+            
+            // Prediction button listeners
+            document.getElementById('over-btn').addEventListener('click', () => setPrediction(true, false));
+            document.getElementById('under-btn').addEventListener('click', () => setPrediction(false, false));
+            document.getElementById('auto-over-btn').addEventListener('click', () => setPrediction(true, true));
+            document.getElementById('auto-under-btn').addEventListener('click', () => setPrediction(false, true));
+            
+            // Roll number input listeners
+            document.getElementById('roll-number').addEventListener('input', updateManualMultiplier);
+            document.getElementById('roll-slider').addEventListener('input', updateManualSlider);
+            document.getElementById('auto-roll-number').addEventListener('input', updateAutoMultiplier);
+            document.getElementById('auto-roll-slider').addEventListener('input', updateAutoSlider);
+            
+            // Strategy listeners
+            document.getElementById('strategy-none').addEventListener('click', () => setStrategy('none'));
+            document.getElementById('strategy-martingale').addEventListener('click', () => setStrategy('martingale'));
+            document.getElementById('strategy-fibonacci').addEventListener('click', () => setStrategy('fibonacci'));
+            
+            // Bet input formatting
+            document.getElementById('bet-amount').addEventListener('input', formatBetInput);
+            document.getElementById('auto-bet-amount').addEventListener('input', formatAutoBetInput);
+            document.getElementById('auto-stop-win').addEventListener('input', formatAutoStopWin);
+            document.getElementById('auto-stop-loss').addEventListener('input', formatAutoStopLoss);
+            
+            // Initialize multipliers
+            updateManualMultiplier();
+            updateAutoMultiplier();
+        });
+
+        // User Authentication Functions
+        function checkUserLogin() {
+            const userData = localStorage.getItem(STORAGE_KEY);
+            
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                userBalance = currentUser.balance;
+                gamesPlayed = currentUser.gamesPlayed;
+                totalWon = currentUser.totalWon;
+                totalWagered = currentUser.totalWagered;
+                
+                // Update UI
+                document.getElementById('welcome-username').textContent = `Willkommen, ${currentUser.username}`;
+                updateUserStats();
+                
+                // Hide modal if it's open
+                const authModal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+                if (authModal) {
+                    authModal.hide();
+                }
+            } else {
+                // Show login modal
+                const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+                authModal.show();
+            }
+        }
+
+        function loginUser() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showToast('Bitte Benutzername und Passwort eingeben', 'warning');
+                return;
+            }
+            
+            // Check if user exists in localStorage
+            const allUsers = JSON.parse(localStorage.getItem('diceGameAllUsers') || '{}');
+            
+            if (allUsers[username] && allUsers[username].password === password) {
+                // Login successful
+                currentUser = allUsers[username];
+                userBalance = currentUser.balance;
+                gamesPlayed = currentUser.gamesPlayed;
+                totalWon = currentUser.totalWon;
+                totalWagered = currentUser.totalWagered;
+                
+                // Save to localStorage
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                
+                document.getElementById('welcome-username').textContent = `Willkommen, ${currentUser.username}`;
+                updateUserStats();
+                
+                // Hide modal
+                const authModal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+                authModal.hide();
+                
+                showToast('Erfolgreich angemeldet!', 'success');
+            } else {
+                showToast('Ungültiger Benutzername oder Passwort', 'danger');
+            }
+        }
+
+        function registerUser() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showToast('Bitte Benutzername und Passwort eingeben', 'warning');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showToast('Benutzername muss mindestens 3 Zeichen lang sein', 'warning');
+                return;
+            }
+            
+            if (password.length < 4) {
+                showToast('Passwort muss mindestens 4 Zeichen lang sein', 'warning');
+                return;
+            }
+            
+            // Check if user already exists
+            const allUsers = JSON.parse(localStorage.getItem('diceGameAllUsers') || '{}');
+            
+            if (allUsers[username]) {
+                showToast('Benutzername bereits vergeben', 'danger');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                username: username,
+                password: password,
+                balance: 1000.0, // Starting balance
+                gamesPlayed: 0,
+                totalWon: 0,
+                totalWagered: 0
+            };
+            
+            // Save to all users
+            allUsers[username] = newUser;
+            localStorage.setItem('diceGameAllUsers', JSON.stringify(allUsers));
+            
+            // Set as current user
+            currentUser = newUser;
+            userBalance = currentUser.balance;
+            gamesPlayed = currentUser.gamesPlayed;
+            totalWon = currentUser.totalWon;
+            totalWagered = currentUser.totalWagered;
+            
+            // Save to localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+            
+            // Update UI
+            document.getElementById('welcome-username').textContent = `Willkommen, ${currentUser.username}`;
+            updateUserStats();
+            
+            // Hide modal
+            const authModal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+            authModal.hide();
+            
+            showToast('Registrierung erfolgreich! $1000 gutgeschrieben.', 'success');
+        }
+
+        function logoutUser() {
+            // Remove current user from localStorage
+            localStorage.removeItem(STORAGE_KEY);
+            
+            // Reset variables
+            currentUser = null;
+            userBalance = 0;
+            gamesPlayed = 0;
+            totalWon = 0;
+            totalWagered = 0;
+            
+            // Update UI
+            document.getElementById('welcome-username').textContent = 'Willkommen';
+            updateUserStats();
+            
+            // Show login modal
+            const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+            authModal.show();
+            
+            // Reset game
+            endGame();
+            
+            showToast('Erfolgreich abgemeldet', 'info');
+        }
+
+        function saveUserData() {
+            if (currentUser) {
+                currentUser.balance = userBalance;
+                currentUser.gamesPlayed = gamesPlayed;
+                currentUser.totalWon = totalWon;
+                currentUser.totalWagered = totalWagered;
+                
+                // Save to localStorage
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                
+                // Update in all users
+                const allUsers = JSON.parse(localStorage.getItem('diceGameAllUsers') || '{}');
+                allUsers[currentUser.username] = currentUser;
+                localStorage.setItem('diceGameAllUsers', JSON.stringify(allUsers));
+            }
+        }
+
+        // Mode switching
+        function switchMode(mode) {
+            if (gameActive || autoRunning) {
+                showToast('Beende das aktuelle Spiel zuerst!', 'warning');
+                return;
+            }
+            
+            autoMode = (mode === 'auto');
+            
+            // Update tab states
+            if (autoMode) {
+                document.getElementById('auto-tab').classList.remove('inactive');
+                document.getElementById('auto-tab').classList.add('active');
+                document.getElementById('manual-tab').classList.remove('active');
+                document.getElementById('manual-tab').classList.add('inactive');
+                
+                document.getElementById('manual-content').style.display = 'none';
+                document.getElementById('auto-content').classList.add('active');
+                document.getElementById('auto-stats').classList.add('active');
+            } else {
+                document.getElementById('manual-tab').classList.remove('inactive');
+                document.getElementById('manual-tab').classList.add('active');
+                document.getElementById('auto-tab').classList.remove('active');
+                document.getElementById('auto-tab').classList.add('inactive');
+                
+                document.getElementById('manual-content').style.display = 'flex';
+                document.getElementById('auto-content').classList.remove('active');
+                document.getElementById('auto-stats').classList.remove('active');
+            }
+            
+            updateStartButton();
+            updateGameInfo();
+        }
+
+        function updateStartButton() {
+            const startBtn = document.getElementById('start-game');
+            
+            if (!currentUser) {
+                startBtn.textContent = 'Login to Play';
+                startBtn.disabled = true;
+                return;
+            }
+            
+            startBtn.disabled = false;
+            
+            if (autoMode) {
+                if (autoRunning) {
+                    startBtn.textContent = 'Stop Auto';
+                    startBtn.style.backgroundColor = 'var(--accent-red)';
+                } else {
+                    startBtn.textContent = 'Start Auto';
+                    startBtn.style.backgroundColor = 'var(--accent-green)';
+                }
+            } else {
+                if (gameActive) {
+                    startBtn.textContent = 'Rolling...';
+                    startBtn.disabled = true;
+                } else {
+                    startBtn.textContent = 'Roll Dice';
+                    startBtn.style.backgroundColor = 'var(--accent-green)';
+                }
+            }
+        }
+
+        // Prediction functions
+        function setPrediction(over, isAuto) {
+            isOver = over;
+            
+            if (isAuto) {
+                // Update auto prediction buttons
+                if (over) {
+                    document.getElementById('auto-over-btn').classList.add('active');
+                    document.getElementById('auto-under-btn').classList.remove('active');
+                    document.getElementById('auto-prediction-type').textContent = 'Over';
+                } else {
+                    document.getElementById('auto-under-btn').classList.add('active');
+                    document.getElementById('auto-over-btn').classList.remove('active');
+                    document.getElementById('auto-prediction-type').textContent = 'Under';
+                }
+                updateAutoMultiplier();
+            } else {
+                // Update manual prediction buttons
+                if (over) {
+                    document.getElementById('over-btn').classList.add('active');
+                    document.getElementById('under-btn').classList.remove('active');
+                    document.getElementById('prediction-type').textContent = 'Over';
+                } else {
+                    document.getElementById('under-btn').classList.add('active');
+                    document.getElementById('over-btn').classList.remove('active');
+                    document.getElementById('prediction-type').textContent = 'Under';
+                }
+                updateManualMultiplier();
+            }
+            
+            updateGameInfo();
+        }
+
+        // Multiplier calculation functions
+        function calculateMultiplier(target, over) {
+            let winChance;
+            if (over) {
+                winChance = (100 - target) / 100;
+            } else {
+                winChance = (target - 1) / 100;
+            }
+            
+            if (winChance <= 0) winChance = 0.01;
+            
+            const multiplier = (0.99 / winChance); // 1% house edge
+            return Math.max(1.01, multiplier);
+        }
+
+        function updateManualMultiplier() {
+            const target = parseInt(document.getElementById('roll-number').value);
+            const slider = document.getElementById('roll-slider');
+            
+            // Sync slider with input
+            slider.value = target;
+            rollTarget = target;
+            
+            const multiplier = calculateMultiplier(target, isOver);
+            const winChance = isOver ? (100 - target) : (target - 1);
+            
+            document.getElementById('multiplier').textContent = multiplier.toFixed(2) + 'x';
+            document.getElementById('win-chance').textContent = winChance.toFixed(2) + '%';
+            
+            updateGameInfo();
+        }
+
+        function updateManualSlider() {
+            const slider = document.getElementById('roll-slider');
+            const input = document.getElementById('roll-number');
+            
+            // Sync input with slider
+            input.value = slider.value;
+            updateManualMultiplier();
+        }
+
+        function updateAutoMultiplier() {
+            const target = parseInt(document.getElementById('auto-roll-number').value);
+            const slider = document.getElementById('auto-roll-slider');
+            
+            // Sync slider with input
+            slider.value = target;
+            
+            const multiplier = calculateMultiplier(target, isOver);
+            const winChance = isOver ? (100 - target) : (target - 1);
+            
+            document.getElementById('auto-multiplier').textContent = multiplier.toFixed(2) + 'x';
+            document.getElementById('auto-win-chance').textContent = winChance.toFixed(2) + '%';
+        }
+
+        function updateAutoSlider() {
+            const slider = document.getElementById('auto-roll-slider');
+            const input = document.getElementById('auto-roll-number');
+            
+            // Sync input with slider
+            input.value = slider.value;
+            updateAutoMultiplier();
+        }
+
+        // Strategy functions
+        function setStrategy(strategy) {
+            autoStrategy = strategy;
+            
+            // Update strategy buttons
+            document.querySelectorAll('.strategy-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`strategy-${strategy}`).classList.add('active');
+            
+            // Reset strategy variables
+            fibonacciIndex = 0;
+            currentAutoMultiplier = 1;
+        }
+
+        function applyStrategy(won) {
+            if (autoStrategy === 'none') return;
+            
+            const baseBet = parseFloat(document.getElementById('auto-bet-amount').value.replace('$', ''));
+            let newBet = baseBet;
+            
+            if (autoStrategy === 'martingale') {
+                if (won) {
+                    newBet = baseBet;
+                    currentAutoMultiplier = 1;
+                } else {
+                    currentAutoMultiplier *= 2;
+                    newBet = baseBet * currentAutoMultiplier;
+                }
+            } else if (autoStrategy === 'fibonacci') {
+                if (won) {
+                    fibonacciIndex = Math.max(0, fibonacciIndex - 2);
+                } else {
+                    fibonacciIndex++;
+                    if (fibonacciIndex >= fibonacciSequence.length) {
+                        const nextFib = fibonacciSequence[fibonacciSequence.length - 1] + 
+                                       fibonacciSequence[fibonacciSequence.length - 2];
+                        fibonacciSequence.push(nextFib);
+                    }
+                }
+                newBet = baseBet * fibonacciSequence[fibonacciIndex];
+            }
+            
+            // Ensure bet doesn't exceed balance
+            newBet = Math.min(newBet, userBalance);
+            document.getElementById('auto-bet-amount').value = `$${newBet.toFixed(2)}`;
+        }
+
+        // Game functions
+        function initializeGame() {
+            gameActive = false;
+            autoRunning = false;
+            currentStreak = 0;
+            
+            // Reset dice display
+            document.getElementById('dice-number').textContent = '?';
+            document.getElementById('dice-display').className = 'dice-display';
+            
+            // Hide result display
+            document.getElementById('result-display').style.display = 'none';
+            
+            updateStartButton();
+            updateGameInfo();
+        }
+
+        function handleStartButton() {
+            if (!currentUser) {
+                showToast('Bitte melde dich an, um zu spielen', 'warning');
+                const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+                authModal.show();
+                return;
+            }
+            
+            if (autoMode) {
+                if (autoRunning) {
+                    stopAutoMode();
+                } else {
+                    startAutoMode();
+                }
+            } else {
+                if (!gameActive) {
+                    rollDice();
+                }
+            }
+        }
+
+        function startAutoMode() {
+            const betInput = document.getElementById('auto-bet-amount').value;
+            const betAmount = parseFloat(betInput.replace('$', ''));
+            
+            if (betAmount <= 0 || betAmount > userBalance) {
+                showToast('Ungültiger Einsatz!', 'danger');
+                return;
+            }
+            
+            autoBetCount = parseInt(document.getElementById('auto-bet-count').value) || 10;
+            autoStopWin = parseFloat(document.getElementById('auto-stop-win').value.replace('$', '')) || 0;
+            autoStopLoss = parseFloat(document.getElementById('auto-stop-loss').value.replace('$', '')) || 0;
+            autoCurrentBets = 0;
+            autoStartBalance = userBalance;
+            autoWins = 0;
+            autoLosses = 0;
+            autoRunning = true;
+            baseBetAmount = betAmount;
+            
+            // Get auto settings
+            rollTarget = parseInt(document.getElementById('auto-roll-number').value);
+            isOver = document.getElementById('auto-over-btn').classList.contains('active');
+            
+            updateStartButton();
+            updateAutoStats();
+            showToast('Auto Modus gestartet!', 'info');
+            
+            // Start first auto roll
+            setTimeout(() => {
+                runAutoRoll();
+            }, 1000);
+        }
+
+        function stopAutoMode() {
+            autoRunning = false;
+            gameActive = false;
+            
+            updateStartButton();
+            
+            const profit = userBalance - autoStartBalance;
+            const profitText = profit >= 0 ? `+$${profit.toFixed(2)}` : `-$${Math.abs(profit).toFixed(2)}`;
+            showToast(`Auto Modus gestoppt! Profit: ${profitText}`, profit >= 0 ? 'success' : 'info');
+        }
+
+        function runAutoRoll() {
+            if (!autoRunning || autoCurrentBets >= autoBetCount) {
+                stopAutoMode();
+                return;
+            }
+            
+            // Check stop conditions
+            const currentProfit = userBalance - autoStartBalance;
+            if (autoStopWin > 0 && currentProfit >= autoStopWin) {
+                showToast(`Auto gestoppt: Gewinnziel erreicht! +$${currentProfit.toFixed(2)}`, 'success');
+                stopAutoMode();
+                return;
+            }
+            
+            if (autoStopLoss > 0 && currentProfit <= -autoStopLoss) {
+                showToast(`Auto gestoppt: Verlustlimit erreicht! -$${Math.abs(currentProfit).toFixed(2)}`, 'danger');
+                stopAutoMode();
+                return;
+            }
+            
+            const betInput = document.getElementById('auto-bet-amount').value;
+            const betAmount = parseFloat(betInput.replace('$', ''));
+            
+            if (betAmount > userBalance) {
+                showToast('Nicht genügend Guthaben für Auto Modus!', 'danger');
+                stopAutoMode();
+                return;
+            }
+            
+            // Execute auto roll
+            autoCurrentBets++;
+            rollDice(true, betAmount);
+        }
+
+        function rollDice(isAutoRoll = false, autoBetAmount = 0) {
+            if (gameActive && !isAutoRoll) return;
+            
+            const betAmount = isAutoRoll ? autoBetAmount : parseFloat(document.getElementById('bet-amount').value.replace('$', ''));
+            
+            if (betAmount <= 0 || betAmount > userBalance) {
+                showToast('Ungültiger Einsatz!', 'danger');
+                return;
+            }
+            
+            gameActive = true;
+            currentBet = betAmount;
+            
+            // Get current settings
+            if (!isAutoRoll) {
+                rollTarget = parseInt(document.getElementById('roll-number').value);
+                isOver = document.getElementById('over-btn').classList.contains('active');
+            }
+            
+            // Update balance
+            userBalance -= currentBet;
+            totalWagered += currentBet;
+            updateUserStats();
+            updateGameInfo();
+            updateStartButton();
+            
+            // Animate dice roll
+            const diceDisplay = document.getElementById('dice-display');
+            const diceNumber = document.getElementById('dice-number');
+            
+            diceDisplay.classList.add('rolling');
+            diceNumber.textContent = '?';
+            
+            // Show rolling animation
+            let rollCount = 0;
+            const rollInterval = setInterval(() => {
+                diceNumber.textContent = Math.floor(Math.random() * 100) + 1;
+                rollCount++;
+                
+                if (rollCount >= 20) {
+                    clearInterval(rollInterval);
+                    
+                    // Generate final result
+                    const result = Math.floor(Math.random() * 100) + 1;
+                    diceNumber.textContent = result;
+                    lastRoll = result;
+                    
+                    // Determine win/loss
+                    let won = false;
+                    if (isOver && result > rollTarget) {
+                        won = true;
+                    } else if (!isOver && result < rollTarget) {
+                        won = true;
+                    }
+                    
+                    // Calculate winnings
+                    const multiplier = calculateMultiplier(rollTarget, isOver);
+                    const winAmount = won ? currentBet * multiplier : 0;
+                    
+                    // Update display
+                    diceDisplay.classList.remove('rolling');
+                    if (won) {
+                        diceDisplay.classList.add('win');
+                        userBalance += winAmount;
+                        totalWon += winAmount;
+                        currentStreak = currentStreak >= 0 ? currentStreak + 1 : 1;
+                        
+                        if (isAutoRoll) {
+                            autoWins++;
+                        }
+                        
+                        showResult(true, winAmount, result);
+                        createParticles(diceDisplay);
+                    } else {
+                        diceDisplay.classList.add('lose');
+                        currentStreak = currentStreak <= 0 ? currentStreak - 1 : -1;
+                        
+                        if (isAutoRoll) {
+                            autoLosses++;
+                        }
+                        
+                        showResult(false, 0, result);
+                    }
+                    
+                    // Update stats
+                    if (!isAutoRoll) {
+                        gamesPlayed++;
+                    }
+                    updateUserStats();
+                    updateGameInfo();
+                    saveUserData();
+                    
+                    // Apply strategy for auto mode
+                    if (isAutoRoll) {
+                        applyStrategy(won);
+                        updateAutoStats();
+                    }
+                    
+                    // Continue auto mode or end game
+                    setTimeout(() => {
+                        gameActive = false;
+                        diceDisplay.classList.remove('win', 'lose');
+                        
+                        if (isAutoRoll && autoRunning) {
+                            runAutoRoll();
+                        } else {
+                            updateStartButton();
+                        }
+                    }, isAutoRoll ? 1500 : 3000);
+                }
+            }, 100);
+        }
+
+        function showResult(won, amount, roll) {
+            const resultDisplay = document.getElementById('result-display');
+            const resultText = document.getElementById('result-text');
+            const resultAmount = document.getElementById('result-amount');
+            
+            resultDisplay.style.display = 'block';
+            
+            if (won) {
+                resultText.textContent = `You Won! (${roll})`;
+                resultText.className = 'result-text win';
+                resultAmount.textContent = `+$${amount.toFixed(2)}`;
+                resultAmount.className = 'result-amount green';
+            } else {
+                resultText.textContent = `You Lost! (${roll})`;
+                resultText.className = 'result-text lose';
+                resultAmount.textContent = `-$${currentBet.toFixed(2)}`;
+                resultAmount.className = 'result-amount red';
+            }
+        }
+
+        function endGame() {
+            gameActive = false;
+            autoRunning = false;
+            
+            setTimeout(() => {
+                initializeGame();
+            }, 1000);
+        }
+
+        // UI Update functions
+        function updateUserStats() {
+            document.getElementById('user-balance').textContent = `$${userBalance.toFixed(2)}`;
+            document.getElementById('games-played').textContent = gamesPlayed;
+            document.getElementById('total-won').textContent = `$${totalWon.toFixed(2)}`;
+            
+            const profit = totalWon - totalWagered;
+            const profitElement = document.getElementById('profit');
+            profitElement.textContent = `$${profit.toFixed(2)}`;
+            profitElement.className = 'profit-value ' + (profit >= 0 ? 'positive' : 'negative');
+        }
+
+        function updateGameInfo() {
+            const betAmount = autoMode ? 
+                parseFloat(document.getElementById('auto-bet-amount').value.replace('$', '')) :
+                parseFloat(document.getElementById('bet-amount').value.replace('$', ''));
+            
+            const target = autoMode ? 
+                parseInt(document.getElementById('auto-roll-number').value) :
+                parseInt(document.getElementById('roll-number').value);
+            
+            const multiplier = calculateMultiplier(target, isOver);
+            const potentialWin = betAmount * multiplier;
+            
+            document.getElementById('current-bet').textContent = `$${betAmount.toFixed(2)}`;
+            document.getElementById('potential-win').textContent = `$${potentialWin.toFixed(2)}`;
+            document.getElementById('last-roll').textContent = lastRoll || '-';
+            document.getElementById('streak').textContent = currentStreak;
+            
+            // Update streak color
+            const streakElement = document.getElementById('streak');
+            if (currentStreak > 0) {
+                streakElement.className = 'info-value green';
+            } else if (currentStreak < 0) {
+                streakElement.className = 'info-value red';
+            } else {
+                streakElement.className = 'info-value';
+            }
+        }
+
+        function updateAutoStats() {
+            document.getElementById('auto-bets-made').textContent = autoCurrentBets;
+            document.getElementById('auto-wins').textContent = autoWins;
+            document.getElementById('auto-losses').textContent = autoLosses;
+            
+            const autoProfit = userBalance - autoStartBalance;
+            const autoProfitElement = document.getElementById('auto-profit');
+            autoProfitElement.textContent = `$${autoProfit.toFixed(2)}`;
+            autoProfitElement.className = 'auto-stat-value ' + (autoProfit >= 0 ? 'green' : 'red');
+        }
+
+        // Utility functions
+        function setBet(multiplier) {
+            const betInput = document.getElementById('bet-amount');
+            let currentBet = parseFloat(betInput.value.replace('$', '')) || 0;
+            
+            if (multiplier === 'max') {
+                currentBet = userBalance;
+            } else if (multiplier === 0.5) {
+                currentBet = currentBet / 2;
+            } else if (multiplier === 2) {
+                currentBet = currentBet * 2;
+            }
+            
+            currentBet = Math.min(currentBet, userBalance);
+            currentBet = Math.max(currentBet, 0);
+            
+            betInput.value = `$${currentBet.toFixed(2)}`;
+            updateGameInfo();
+        }
+
+        // Input formatting functions
+        function formatBetInput() {
+            const input = document.getElementById('bet-amount');
+            let value = input.value.replace(/[^0-9.]/g, '');
+            if (value && !isNaN(parseFloat(value))) {
+                input.value = `$${parseFloat(value).toFixed(2)}`;
+                updateGameInfo();
+            }
+        }
+
+        function formatAutoBetInput() {
+            const input = document.getElementById('auto-bet-amount');
+            let value = input.value.replace(/[^0-9.]/g, '');
+            if (value && !isNaN(parseFloat(value))) {
+                input.value = `$${parseFloat(value).toFixed(2)}`;
+            }
+        }
+
+        function formatAutoStopWin() {
+            const input = document.getElementById('auto-stop-win');
+            let value = input.value.replace(/[^0-9.]/g, '');
+            if (value && !isNaN(parseFloat(value))) {
+                input.value = `$${parseFloat(value).toFixed(2)}`;
+            }
+        }
+
+        function formatAutoStopLoss() {
+            const input = document.getElementById('auto-stop-loss');
+            let value = input.value.replace(/[^0-9.]/g, '');
+            if (value && !isNaN(parseFloat(value))) {
+                input.value = `$${parseFloat(value).toFixed(2)}`;
+            }
+        }
+
+        function showToast(message, type) {
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+                toastContainer.style.zIndex = '9999';
+                document.body.appendChild(toastContainer);
+            }
+            
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+            toast.show();
+            
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+        }
+
+        function createParticles(element) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.position = 'fixed';
+                particle.style.width = '8px';
+                particle.style.height = '8px';
+                particle.style.borderRadius = '50%';
+                particle.style.backgroundColor = getRandomColor();
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.zIndex = '9999';
+                particle.style.pointerEvents = 'none';
+                
+                document.body.appendChild(particle);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 5 + Math.random() * 10;
+                const tx = Math.cos(angle) * speed * 15;
+                const ty = Math.sin(angle) * speed * 15;
+                
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                
+                particle.addEventListener('animationend', () => {
+                    particle.remove();
+                });
+            }
+        }
+
+        function getRandomColor() {
+            const colors = ['#2F80ED', '#7ED321', '#F2C94C', '#EB5757', '#9B51E0'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' && !gameActive && !autoRunning && currentUser) {
+                e.preventDefault();
+                if (!autoMode) {
+                    rollDice();
+                }
+            } else if (e.code === 'Enter' && currentUser) {
+                e.preventDefault();
+                handleStartButton();
+            } else if (e.code === 'Escape' && autoRunning) {
+                e.preventDefault();
+                stopAutoMode();
+            } else if (e.code === 'ArrowUp' && !gameActive) {
+                e.preventDefault();
+                setPrediction(true, autoMode);
+            } else if (e.code === 'ArrowDown' && !gameActive) {
+                e.preventDefault();
+                setPrediction(false, autoMode);
+            }
+        });
+
+        // Auto-save settings
+        function saveSettings() {
+            const settings = {
+                betAmount: document.getElementById('bet-amount').value,
+                autoBetAmount: document.getElementById('auto-bet-amount').value,
+                rollNumber: document.getElementById('roll-number').value,
+                autoRollNumber: document.getElementById('auto-roll-number').value,
+                isOver: isOver,
+                autoStrategy: autoStrategy
+            };
+            localStorage.setItem('diceGameSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('diceGameSettings') || '{}');
+            
+            if (settings.betAmount) {
+                document.getElementById('bet-amount').value = settings.betAmount;
+            }
+            if (settings.autoBetAmount) {
+                document.getElementById('auto-bet-amount').value = settings.autoBetAmount;
+            }
+            if (settings.rollNumber) {
+                document.getElementById('roll-number').value = settings.rollNumber;
+                document.getElementById('roll-slider').value = settings.rollNumber;
+            }
+            if (settings.autoRollNumber) {
+                document.getElementById('auto-roll-number').value = settings.autoRollNumber;
+                document.getElementById('auto-roll-slider').value = settings.autoRollNumber;
+            }
+            if (settings.isOver !== undefined) {
+                setPrediction(settings.isOver, false);
+                setPrediction(settings.isOver, true);
+            }
+            if (settings.autoStrategy) {
+                setStrategy(settings.autoStrategy);
+            }
+        }
+
+        // Save settings when they change
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('#bet-amount, #auto-bet-amount, #roll-number, #auto-roll-number')) {
+                saveSettings();
+            }
+        });
+
+        // Performance optimization: Debounce rapid clicks
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Prevent double-click issues
+        let lastClickTime = 0;
+        document.addEventListener('click', function(e) {
+            const now = Date.now();
+            if (now - lastClickTime < 200) {
+                e.preventDefault();
+                return false;
+            }
+            lastClickTime = now;
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            loadSettings();
+            updateManualMultiplier();
+            updateAutoMultiplier();
+            updateStartButton();
+            updateGameInfo();
+        });
+
+        // Handle page visibility change (pause auto mode when tab is hidden)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && autoRunning) {
+                showToast('Auto Modus pausiert (Tab nicht sichtbar)', 'warning');
+            }
+        });
+
+        // Handle window resize for responsive design
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 768) {
+                // Mobile adjustments
+                const diceDisplay = document.getElementById('dice-display');
+                diceDisplay.style.width = '150px';
+                diceDisplay.style.height = '150px';
+                
+                const diceNumber = document.getElementById('dice-number');
+                diceNumber.style.fontSize = '60px';
+            } else {
+                // Desktop adjustments
+                const diceDisplay = document.getElementById('dice-display');
+                diceDisplay.style.width = '200px';
+                diceDisplay.style.height = '200px';
+                
+                const diceNumber = document.getElementById('dice-number');
+                diceNumber.style.fontSize = '80px';
+            }
+        });
+
+        // Error handling for localStorage
+        function safeLocalStorage(key, value = null) {
+            try {
+                if (value === null) {
+                    return localStorage.getItem(key);
+                } else {
+                    localStorage.setItem(key, value);
+                }
+            } catch (e) {
+                console.warn('LocalStorage not available:', e);
+                return null;
+            }
+        }
+
+        // Replace localStorage calls with safe version
+        function safeSaveUserData() {
+            if (currentUser) {
+                currentUser.balance = userBalance;
+                currentUser.gamesPlayed = gamesPlayed;
+                currentUser.totalWon = totalWon;
+                currentUser.totalWagered = totalWagered;
+                
+                safeLocalStorage(STORAGE_KEY, JSON.stringify(currentUser));
+                
+                const allUsers = JSON.parse(safeLocalStorage('diceGameAllUsers') || '{}');
+                allUsers[currentUser.username] = currentUser;
+                safeLocalStorage('diceGameAllUsers', JSON.stringify(allUsers));
+            }
+        }
+
+        // Update saveUserData function
+        saveUserData = safeSaveUserData;
+
+        // Add sound effects (optional)
+        function playSound(type) {
+            // Create audio context for sound effects
+            if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+                const audioContext = new (AudioContext || webkitAudioContext)();
+                
+                if (type === 'win') {
+                    // Play win sound
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                    
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } else if (type === 'lose') {
+                    // Play lose sound
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // A3
+                    oscillator.frequency.setValueAtTime(196, audioContext.currentTime + 0.1); // G3
+                    oscillator.frequency.setValueAtTime(174.61, audioContext.currentTime + 0.2); // F3
+                    
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } else if (type === 'roll') {
+                    // Play roll sound
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                }
+            }
+        }
+
+        // Enhanced roll function with sound
+        const originalRollDice = rollDice;
+        rollDice = function(isAutoRoll = false, autoBetAmount = 0) {
+            playSound('roll');
+            return originalRollDice(isAutoRoll, autoBetAmount);
+        };
+
+        // Enhanced result function with sound
+        const originalShowResult = showResult;
+        showResult = function(won, amount, roll) {
+            playSound(won ? 'win' : 'lose');
+            return originalShowResult(won, amount, roll);
+        };
+
+        // Add visual feedback for buttons
+        function addButtonFeedback() {
+            document.querySelectorAll('button').forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        }
+
+        // Initialize button feedback
+        addButtonFeedback();
+
+        // Add smooth transitions for better UX
+        document.querySelectorAll('button, input, .info-card, .auto-stat-card').forEach(element => {
+            element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+
+        // Add loading states
+        function showLoading(element) {
+            element.classList.add('loading');
+        }
+
+        function hideLoading(element) {
+            element.classList.remove('loading');
+        }
+
+        // Enhanced auto mode with better error handling
+        function enhancedAutoMode() {
+            // Add connection check
+            if (!navigator.onLine) {
+                showToast('Keine Internetverbindung!', 'warning');
+                stopAutoMode();
+                return;
+            }
+            
+            // Add balance check
+            if (userBalance <= 0) {
+                showToast('Nicht genügend Guthaben!', 'danger');
+                stopAutoMode();
+                return;
+            }
+        }
+
+        // Add connection status monitoring
+        window.addEventListener('online', function() {
+            showToast('Verbindung wiederhergestellt', 'success');
+        });
+
+        window.addEventListener('offline', function() {
+            showToast('Verbindung verloren', 'warning');
+            if (autoRunning) {
+                stopAutoMode();
+            }
+        });
+
+        // Add performance monitoring
+        let performanceMetrics = {
+            rollsPerSecond: 0,
+            averageRollTime: 0,
+            totalRolls: 0
+        };
+
+        function updatePerformanceMetrics(rollTime) {
+            performanceMetrics.totalRolls++;
+            performanceMetrics.averageRollTime = 
+                (performanceMetrics.averageRollTime * (performanceMetrics.totalRolls - 1) + rollTime) / 
+                performanceMetrics.totalRolls;
+            
+            if (performanceMetrics.averageRollTime > 0) {
+                performanceMetrics.rollsPerSecond = 1000 / performanceMetrics.averageRollTime;
+            }
+        }
+
+        // Add game statistics tracking
+        let gameStats = {
+            longestWinStreak: 0,
+            longestLoseStreak: 0,
+            biggestWin: 0,
+            biggestLoss: 0,
+            totalRolls: 0
+        };
+
+        function updateGameStats(won, amount) {
+            gameStats.totalRolls++;
+            
+            if (won) {
+                if (amount > gameStats.biggestWin) {
+                    gameStats.biggestWin = amount;
+                }
+                if (currentStreak > gameStats.longestWinStreak) {
+                    gameStats.longestWinStreak = currentStreak;
+                }
+            } else {
+                if (amount > gameStats.biggestLoss) {
+                    gameStats.biggestLoss = amount;
+                }
+                if (Math.abs(currentStreak) > gameStats.longestLoseStreak) {
+                    gameStats.longestLoseStreak = Math.abs(currentStreak);
+                }
+            }
+            
+            // Save stats
+            localStorage.setItem('diceGameStats', JSON.stringify(gameStats));
+        }
+
+        // Load game stats on startup
+        function loadGameStats() {
+            const savedStats = localStorage.getItem('diceGameStats');
+            if (savedStats) {
+                gameStats = JSON.parse(savedStats);
+            }
+        }
+
+        // Initialize stats
+        loadGameStats();
+
+        console.log('Dice game initialized successfully!');
+        console.log('Keyboard shortcuts:');
+        console.log('- Space: Roll dice (manual mode)');
+        console.log('- Enter: Start/Stop');
+        console.log('- Escape: Stop auto mode');
+        console.log('- Arrow Up: Set prediction to Over');
+        console.log('- Arrow Down: Set prediction to Under');
+    </script>
+</body>
+</html>
